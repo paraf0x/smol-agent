@@ -3,7 +3,8 @@
   "package": "dev.smolagent.mixin",
   "compatibilityLevel": "JAVA_25",
   "client": [
-    "PlayerTabOverlayMixin"
+    "PlayerTabOverlayMixin",
+    "ChatComponentMixin"
   ],
   "injectors": {
     "defaultRequire": 1
