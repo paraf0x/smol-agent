@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "smol-agent",
+  "version": "${version}",
+  "name": "Smol Agent",
+  "description": "Cosmetically rewrites 'Agent'/'agent' substrings to 'Smol'/'smol' in tab, nametag, and chat. Client-side only.",
+  "authors": ["paraf0x"],
+  "license": "MIT",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "dev.smolagent.SmolAgentMod"
+    ]
+  },
+  "mixins": [
+    "smol-agent.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.19.2",
+    "fabric-api": "*",
+    "java": ">=25",
+    "minecraft": "~26.1.2"
+  }
+}
