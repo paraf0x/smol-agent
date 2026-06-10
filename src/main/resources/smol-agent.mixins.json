@@ -2,7 +2,9 @@
   "required": true,
   "package": "dev.smolagent.mixin",
   "compatibilityLevel": "JAVA_25",
-  "client": [],
+  "client": [
+    "PlayerTabOverlayMixin"
+  ],
   "injectors": {
     "defaultRequire": 1
   }
