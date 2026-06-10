@@ -4,7 +4,8 @@
   "compatibilityLevel": "JAVA_25",
   "client": [
     "PlayerTabOverlayMixin",
-    "ChatComponentMixin"
+    "ChatComponentMixin",
+    "EntityRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1
