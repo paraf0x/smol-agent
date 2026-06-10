@@ -10,7 +10,7 @@ other players, and gameplay are unaffected.
 ## Install
 
 Drop `smol-agent-1.0.0.jar` into your Fabric 26.1.2 client's `mods/` folder
-alongside Fabric API.
+alongside Fabric API `0.149.0+26.1.2` or newer. Requires Java 25.
 
 ## Build
 
