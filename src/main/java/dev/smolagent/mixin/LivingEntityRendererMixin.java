@@ -9,8 +9,11 @@ import dev.smolagent.alpha.AlphaSubmitNodeCollector;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
 
 /**
@@ -45,6 +48,35 @@ public class LivingEntityRendererMixin {
             effective = new AlphaSubmitNodeCollector(submitNodeCollector, AGENT_ALPHA);
         }
         original.call(state, poseStack, effective, camera);
+    }
+
+    /**
+     * Swap the player's main-body RenderType from cutout (opaque pipeline,
+     * GL blending disabled) to entityTranslucent (translucent pipeline,
+     * blending enabled) for agent players. Without this swap, the alpha byte
+     * written by {@link AlphaSubmitNodeCollector} is silently ignored — the
+     * body skin renders fully opaque even with alpha=77/255.
+     *
+     * <p>Only the BASE MODEL surface goes through this hook. Armor and cape
+     * feature renderers use their own RenderType-picking code paths and are
+     * unaffected; if those need transparency too, they will require their own
+     * mixins.
+     */
+    @WrapMethod(method = "getRenderType")
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    private RenderType smolagent$translucentForAgent(
+            LivingEntityRenderState state,
+            boolean visible,
+            boolean shouldShowBody,
+            boolean glowing,
+            Operation<RenderType> original) {
+        if (visible && state != null && AgentDetector.isAgent(extractName(state))) {
+            Identifier texture = ((LivingEntityRenderer) (Object) this).getTextureLocation(state);
+            if (texture != null) {
+                return RenderTypes.entityTranslucent(texture);
+            }
+        }
+        return original.call(state, visible, shouldShowBody, glowing);
     }
 
     /**
