@@ -17,19 +17,23 @@ import net.minecraft.resources.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
 
 /**
- * Wraps LivingEntityRenderer.submit so that whenever the rendered entity's
- * displayed name contains "Agent" or "agent", every sub-render that runs
- * during this call (skin, cape, armor feature renderers, glints, nametag)
- * receives a SubmitNodeCollector whose tintedColor alpha is multiplied by 0.3.
+ * Wraps two methods on {@link LivingEntityRenderer}:
  *
- * <p>MC 26.1.2 uses submit(state, poseStack, SubmitNodeCollector, CameraRenderState)
- * instead of the older render(state, poseStack, MultiBufferSource, packedLight).
- * The alpha effect is achieved by wrapping the SubmitNodeCollector with
- * {@link AlphaSubmitNodeCollector}, which multiplies the tintedColor ARGB alpha
- * on every submitModel and submitModelPart call.
+ * <ul>
+ *   <li>{@code submit} — replaces the {@link SubmitNodeCollector} with an
+ *       {@link AlphaSubmitNodeCollector} for agent players, multiplying the
+ *       tintedColor alpha by 0.3 on every submitModel / submitModelPart call.
+ *   <li>{@code getRenderType} — swaps the cutout (opaque, blend-off) RenderType
+ *       for {@link RenderTypes#entityTranslucent} (blend-on) so the reduced
+ *       alpha actually shows up on screen.
+ * </ul>
  *
- * <p>The name is read from {@code EntityRenderState.nameTag}, which is the
- * public Component field set by extractRenderState before submit is called.
+ * <p>Detection reads {@code state.nameTag}, which is populated by
+ * {@link AvatarRendererMixin#smolagent$populateNameTagWithServerNickname}
+ * for the local player (otherwise vanilla leaves it null in third-person view)
+ * or by vanilla for other players. {@code AgentDetector} matches both
+ * {@code Agent}/{@code agent} (pre-rename) and {@code Smol}/{@code smol}
+ * (post-rename).
  */
 @Mixin(LivingEntityRenderer.class)
 public class LivingEntityRendererMixin {
@@ -50,18 +54,6 @@ public class LivingEntityRendererMixin {
         original.call(state, poseStack, effective, camera);
     }
 
-    /**
-     * Swap the player's main-body RenderType from cutout (opaque pipeline,
-     * GL blending disabled) to entityTranslucent (translucent pipeline,
-     * blending enabled) for agent players. Without this swap, the alpha byte
-     * written by {@link AlphaSubmitNodeCollector} is silently ignored — the
-     * body skin renders fully opaque even with alpha=77/255.
-     *
-     * <p>Only the BASE MODEL surface goes through this hook. Armor and cape
-     * feature renderers use their own RenderType-picking code paths and are
-     * unaffected; if those need transparency too, they will require their own
-     * mixins.
-     */
     @WrapMethod(method = "getRenderType")
     @SuppressWarnings({"rawtypes", "unchecked"})
     private RenderType smolagent$translucentForAgent(
@@ -79,11 +71,6 @@ public class LivingEntityRendererMixin {
         return original.call(state, visible, shouldShowBody, glowing);
     }
 
-    /**
-     * Extracts the entity's displayed name as a plain String.
-     * In MC 26.1.2, EntityRenderState.nameTag is a public Component field
-     * populated by EntityRenderer.extractRenderState before submit is called.
-     */
     private static String extractName(LivingEntityRenderState state) {
         Component nameTag = state.nameTag;
         return nameTag != null ? nameTag.getString() : null;
