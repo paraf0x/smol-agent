@@ -3,7 +3,7 @@
   "id": "smol-agent",
   "version": "${version}",
   "name": "Smol Agent",
-  "description": "Cosmetically rewrites 'Agent'/'agent' substrings to 'Smol'/'smol' in tab, nametag, and chat. Client-side only.",
+  "description": "Cosmetically rewrites 'Agent'/'agent' substrings to 'Smol'/'smol' in tab, nametag, and chat, AND renders matching players at 30% opacity. Client-side only.",
   "authors": ["paraf0x"],
   "license": "MIT",
   "environment": "client",

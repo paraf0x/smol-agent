@@ -1,15 +1,15 @@
 # Smol Agent
 
-A client-only Fabric mod for Minecraft 26.1.2 that cosmetically rewrites
-`Agent` → `Smol` and `agent` → `smol` in the tab list, in overhead nametags,
-and in chat messages.
+A client-only Fabric mod for Minecraft 26.1.2 with two cosmetic effects for
+players whose name contains `Agent` or `agent`:
 
-Purely cosmetic. Only your own client sees the rewritten names — the server,
-other players, and gameplay are unaffected.
+- their displayed name is rewritten (`Agent` → `Smol`, `agent` → `smol`) in
+  the tab list, in overhead nametags, and in chat messages
+- they are rendered at 30% opacity — skin, cape, armor, glints, and nametag
 
 ## Install
 
-Drop `smol-agent-1.0.0.jar` into your Fabric 26.1.2 client's `mods/` folder
+Drop `smol-agent-1.1.0.jar` into your Fabric 26.1.2 client's `mods/` folder
 alongside Fabric API `0.149.0+26.1.2` or newer. Requires Java 25.
 
 ## Build
