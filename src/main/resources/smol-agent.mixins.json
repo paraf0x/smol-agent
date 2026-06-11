@@ -6,7 +6,8 @@
     "PlayerTabOverlayMixin",
     "ChatComponentMixin",
     "EntityRendererMixin",
-    "LivingEntityRendererMixin"
+    "LivingEntityRendererMixin",
+    "AvatarRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1
