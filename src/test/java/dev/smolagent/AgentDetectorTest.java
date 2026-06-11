@@ -41,4 +41,22 @@ class AgentDetectorTest {
         // Consistent with v1.0.x NameRewriter behavior — AGENT is not in scope.
         assertFalse(AgentDetector.isAgent("AGENT"));
     }
+
+    @Test
+    void rewrittenSmolCapitalDetected() {
+        // After v1.0.x's rename rewrites "Agent" → "Smol" in the display name,
+        // the transparency mixin still needs to detect agent players via the
+        // rewritten form.
+        assertTrue(AgentDetector.isAgent("SmolCool"));
+    }
+
+    @Test
+    void rewrittenSmolLowercaseDetected() {
+        assertTrue(AgentDetector.isAgent("xsmolY"));
+    }
+
+    @Test
+    void allCapsSmolNotDetected() {
+        assertFalse(AgentDetector.isAgent("SMOL"));
+    }
 }
