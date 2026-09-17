@@ -16,9 +16,9 @@
     "smol-agent.mixins.json"
   ],
   "depends": {
-    "fabricloader": ">=0.19.2",
+    "fabricloader": ">=0.19.5",
     "fabric-api": "*",
     "java": ">=25",
-    "minecraft": "~26.1.2"
+    "minecraft": "~26.3"
   }
 }
