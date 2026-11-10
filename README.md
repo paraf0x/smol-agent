@@ -1,25 +1,28 @@
 # Smol Agent
 
-A client-only Fabric mod for Minecraft 26.1.2 with two cosmetic effects for
-players whose name contains `Agent` or `agent`:
+Client-only Fabric mod for Minecraft 26.3. Type `/smolpp` to open the menu:
 
-- their displayed name is rewritten (`Agent` → `Smol`, `agent` → `smol`) in
-  the tab list, in overhead nametags, and in chat messages
-- they are rendered at 30% opacity — skin, cape, armor, glints, and nametag
+- **Rename** (left): pairs of *name part → replacement*. Every occurrence in any
+  player's name, in the tab list, overhead nametags and chat, is replaced.
+  Matching is case-insensitive; the replacement follows the case of the match
+  (`agent`→`smol`, `Agent`→`Smol`, `AGENT`→`SMOL`).
+- **Translucent** (right): name parts. Any player whose server nickname (the
+  name the server puts in the tab list) contains one of them is drawn
+  translucent. The Minecraft account name only counts for players without a
+  nickname.
+  The slider sets the opacity, 1–100 %.
 
-## Install
+Changes apply live; closing the menu (Done or Esc) saves to
+`config/smol-agent.json`. First start defaults: `Agent → Smol`, translucent
+`agent`, `smol` at 30 %.
 
-Drop `smol-agent-1.1.0.jar` into your Fabric 26.1.2 client's `mods/` folder
-alongside Fabric API `0.149.0+26.1.2` or newer. Requires Java 25.
-
-## Build
+## Build / test
 
 ```sh
-JAVA_HOME=$(brew --prefix openjdk)/libexec/openjdk.jdk/Contents/Home \
-  ./gradlew build
+export JAVA_HOME=/opt/homebrew/opt/openjdk/libexec/openjdk.jdk/Contents/Home
+./gradlew build               # jar in build/libs/, unit tests
+./gradlew runClientGameTest   # drives /smolpp in a real client, ~25 s
 ```
-
-Output jar is in `build/libs/`.
 
 ## License
 

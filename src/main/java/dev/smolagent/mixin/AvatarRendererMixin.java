@@ -1,5 +1,8 @@
 package dev.smolagent.mixin;
 
+import dev.smolagent.NameRules;
+import dev.smolagent.SmolAlphaHolder;
+import dev.smolagent.SmolConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.multiplayer.PlayerInfo;
@@ -12,24 +15,12 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.util.List;
+
 /**
- * Populates {@code AvatarRenderState.nameTag} for the local player so that
- * smol-agent's detection has a name to match against. Vanilla leaves
- * {@code nameTag} null for the local player (their own nametag is never
- * displayed above their own head).
- *
- * <p>Crucially, we prefer the server-side display name from
- * {@link PlayerInfo#getTabListDisplayName()} over the raw Mojang username
- * from {@link Avatar#getName()}. On servers that use nickname plugins (which
- * set the displayed nickname via {@code UPDATE_DISPLAY_NAME} packets), the
- * Mojang name does not contain the agent-relevant substring — only the
- * server-set nickname does. Without this PlayerInfo lookup, a user whose
- * Mojang name is e.g. "UnicornBeef" but whose server nickname is "brsmolity"
- * would not be detected as an agent.
- *
- * <p>Setting {@code nameTag} does NOT make vanilla display the local player's
- * tag — display is gated separately by {@code shouldShowName(...)}. The field
- * is only read by smol-agent's detection.
+ * Decides per frame whether a player is drawn translucent. Matches the configured name parts
+ * against the nickname the server shows in the tab list (as sent, before rename rules).
+ * Players without a server nickname are matched by their account name instead.
  */
 @Mixin(AvatarRenderer.class)
 public class AvatarRendererMixin {
@@ -38,31 +29,26 @@ public class AvatarRendererMixin {
         method = "extractRenderState(Lnet/minecraft/world/entity/Avatar;Lnet/minecraft/client/renderer/entity/state/AvatarRenderState;F)V",
         at = @At("TAIL")
     )
-    private void smolagent$populateNameTagWithServerNickname(
-            Avatar avatar,
-            AvatarRenderState state,
-            float partialTick,
-            CallbackInfo ci) {
-        if (state.nameTag != null) {
-            // Vanilla already set the nametag (other-player case). Leave it —
-            // it will have been rewritten by the rename mixin (Agent → Smol),
-            // and AgentDetector recognises both forms.
-            return;
+    private void smolagent$computeAlpha(Avatar avatar, AvatarRenderState state, float partialTick, CallbackInfo ci) {
+        SmolConfig config = SmolConfig.get();
+        float alpha = 1f;
+        if (config.opacity < SmolConfig.MAX_OPACITY && !config.translucent.isEmpty()
+                && NameRules.matchesAny(namesOf(avatar), config.translucent)) {
+            alpha = config.alpha();
         }
-
-        // Vanilla left nameTag null (local-player case). Prefer the server-side
-        // nickname over the raw Mojang username.
-        Component nickname = resolveServerNickname(avatar);
-        state.nameTag = nickname != null ? nickname : avatar.getName();
+        ((SmolAlphaHolder) state).smolagent$setAlpha(alpha);
     }
 
-    private static Component resolveServerNickname(Avatar avatar) {
-        Minecraft mc = Minecraft.getInstance();
-        if (mc == null) return null;
-        ClientPacketListener conn = mc.getConnection();
+    /** The server nickname if there is one; only without a nickname the account name counts. */
+    private static List<String> namesOf(Avatar avatar) {
+        Component nick = tabListName(avatar);
+        return List.of(nick != null ? nick.getString() : avatar.getName().getString());
+    }
+
+    private static Component tabListName(Avatar avatar) {
+        ClientPacketListener conn = Minecraft.getInstance().getConnection();
         if (conn == null) return null;
         PlayerInfo info = conn.getPlayerInfo(avatar.getUUID());
-        if (info == null) return null;
-        return info.getTabListDisplayName();
+        return info == null ? null : info.getTabListDisplayName();
     }
 }

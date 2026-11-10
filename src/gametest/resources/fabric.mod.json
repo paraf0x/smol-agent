@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "id": "smol-agent-gametest",
+  "version": "1.0.0",
+  "name": "Smol Agent Gametests",
+  "environment": "client",
+  "entrypoints": {
+    "fabric-client-gametest": ["dev.smolagent.gametest.SmolGameTest"]
+  },
+  "depends": {
+    "smol-agent": "*",
+    "fabric-client-gametest-api-v1": "*"
+  }
+}

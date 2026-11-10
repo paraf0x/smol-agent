@@ -3,8 +3,10 @@
   "id": "smol-agent",
   "version": "${version}",
   "name": "Smol Agent",
-  "description": "Cosmetically rewrites 'Agent'/'agent' substrings to 'Smol'/'smol' in tab, nametag, and chat, AND renders matching players at 30% opacity. Client-side only.",
-  "authors": ["paraf0x"],
+  "description": "Client-side cosmetics, configured in-game with /smolpp: rename parts of player names (tab list, nametags, chat) and render players whose name contains given parts translucent (1-100% opacity).",
+  "authors": [
+    "paraf0x"
+  ],
   "license": "MIT",
   "environment": "client",
   "entrypoints": {
